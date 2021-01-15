@@ -145,7 +145,7 @@ def parChecker(symbolString):
     else:
         return False
 
-print(parChecker('((((()))'));
+# print(parChecker('((((()))'));
 
 # 直接运行和使用print NameError: name 'Ture' is not defined, 此处错误是自己写错了True造成的
 # 非常容易出错的typo
@@ -176,8 +176,8 @@ def parchecker(symbolString):
         return True
     else:
         return False
-print(parchecker('{[(+)]}'));
-print(parchecker('({[}])'));
+# print(parchecker('{[(+)]}'));
+# print(parchecker('({[}])'));
 
 #规范答案, 适用性不好，不能判断一般的含其他运算符的字符串
 def parChecker_eg(symbolString):
@@ -209,19 +209,19 @@ def matches(open, close):
 # print(parChecker_eg('({[}])'));
 
 
-# 下面进行基准测试
-
-import timeit
-
-test_string = '({[(((((((())))))))]}])'
-
-test_1 = timeit.Timer('parChecker_eg(test_string)','from __main__ import parChecker_eg, matches, test_string')
-
-print('The time of parChecker_eg is :',test_1.timeit(number = 100000))
-
-test_2 = timeit.Timer('parchecker(test_string)','from __main__ import parchecker, test_string')
-
-print('The time of parchecker is :',test_2.timeit(number = 100000))
+# # 下面进行基准测试
+#
+# import timeit
+#
+# test_string = '({[(((((((())))))))]}])'
+#
+# test_1 = timeit.Timer('parChecker_eg(test_string)','from __main__ import parChecker_eg, matches, test_string')
+#
+# print('The time of parChecker_eg is :',test_1.timeit(number = 100000))
+#
+# test_2 = timeit.Timer('parchecker(test_string)','from __main__ import parchecker, test_string')
+#
+# print('The time of parchecker is :',test_2.timeit(number = 100000))
 
 
 
@@ -284,6 +284,8 @@ def baseConverter(decNumber,base):
 """
 前序、中序和后序表达式
 
+最重要的一句话：前序表达式要求所有的运算符出现在它所作用的 两个操作数之前，后序表达式则相反。
+
 运算符出现在两个操作数的中间 ，所以这种表达式被称作中序表达式
 
 优先级
@@ -299,11 +301,19 @@ def baseConverter(decNumber,base):
 (A + B) * C
 
 中序表达式：  (1+4)*3+10/5 eg 中序表达式就是我们日常使用的表达式,由左往右阅读，结构清晰，但需要括号改变优先级，对计算机不友好
+(1 + 4) * 3 + 10 / 5 
 
 前序表达式（波兰表示法Polish notation，或波兰记法）：
 一种逻辑、算术和代数表示方法，其特点是操作符置于操作数的前面，如果操作符的元数（arity）是固定的，则语法上不需要括号仍然能被无歧义地解析，
 不需要括号来改变优先级，未推广使用。
+ + * + 1 4 3  / 10 5 
+ 
 
+后序表达式： 所有操作符置于操作数的后面，因此也被称为后缀表示法。
+逆波兰记法不需要括号来标识操作符的优先级，使用广泛。
+艾兹格·迪科斯彻引入了调度场算法，用于将中缀表达式转换为后缀形式。因其操作类似于火车编组场而得名。
+大多数操作符优先级解析器(解析器用简单的查表操作即可实现，优先级表由开发者自己定制，在不同的应用场景中，开发者可自由改变操作符的优先级)
+能转换为处理后缀表达式，实际中，一般构造抽象语法树，树的后序遍历即为逆波兰记法。
 
 前序表达式： +AB*C
 后序表达式 AB*C+
@@ -312,3 +322,268 @@ def baseConverter(decNumber,base):
 
 
 """
+
+
+# 实现中序表达式转后序表达式
+
+
+from __main__ import Stack
+import string
+
+def infixToPostfix(infixexpr):
+    try:
+        parchecker(infixexpr)
+        prec = {}
+        prec["*"] = 3
+        prec["/"] = 3
+        prec["+"] = 2
+        prec["-"] = 2
+        prec["("] = 1
+        opStack = Stack()
+        postfixlist = []
+        tokenlist = infixexpr.split()
+
+        for token in tokenlist:
+            if token in string.ascii_uppercase:
+                postfixlist.append(token)
+            elif token == "(":
+                 opStack.push(token)
+            elif token == ")":
+                topToken = opStack.pop()
+                while topToken != "(":
+                    postfixlist.append(topToken)
+                    topToken = opStack.pop()
+            else:
+                while (not opStack.isEmpty()) and \
+                        (prec[opStack.peek()] >= prec[token]):
+                    postfixlist.append(opStack.pop())
+                opStack.push(token)
+        while not opStack.isEmpty():
+            postfixlist.append(opStack.pop())
+        return " ".join(postfixlist)
+    except:
+        # print('Error expression! Please double check! ')
+        # raise Exception('Error expression! Please double check! ')
+        return 'Error expression! Please double check! '
+
+# test
+print(infixToPostfix("( A + B ) * ( C + D ))"))
+print(infixToPostfix("( A + B ) * C"))
+print(infixToPostfix("A + B * C"))
+
+
+# 计算后序表达式的时候，保存操作数
+# 当遇到一个运算符时， 需要用离它最近的两个操作数来计算。
+
+# 实现后序表达式的计算
+
+from __main__ import Stack
+
+def postfixEval(postfixExpr):
+    operandStack = Stack()
+    tokenList = postfixExpr.split()
+    for token in tokenList:
+        if token in "0123456789":
+            operandStack.push(int(token))
+        else:
+            operand2 = operandStack.pop()
+            operand1 = operandStack.pop()
+            result = doMath(token, operand1, operand2)
+            operandStack.push(result)
+    return operandStack.pop()
+
+def doMath(op, op1, op2):
+    if op == "*":
+        return op1 * op2
+    elif op == "/":
+        return op1 / op2
+    elif op == "+":
+       return op1 + op2
+    else:
+       return op1 - op2
+
+
+print(postfixEval("1 2 3 * +"))
+
+
+## 需要改进的地方，原有的后序表达式转换对于数字问题
+## 返回计算后序表达式的时候对于输出字符和数字的控制
+## 异常控制进一步处理
+
+
+
+
+"""
+3.4 队列    FIFO first in first out 
+
+队列 是有序集合，添加操作发生在“尾部”，移除操作则发生在“头 部”。新元素从尾部进入队列，然后一直向前移动到头部，直到成 为下一个被移除的元素。
+
+最新添加的元素必须在队列的尾部等待，在队列中时间最长的元素 则排在最前面。这种排序原则被称作 FIFO (first-in first-out)，即先进先出也称先到先得。
+
+"""
+
+# 使用python实现队列
+
+
+class Queue:
+    def __init__(self):
+        self.items = []
+    def isEmpty(self):
+        return self.items == []
+    def enqueue(self,item):
+        self.items.append(item)
+    def dequeue(self): # 修正空队列，空list问题
+        if len(self.items) != 0:
+            return self.items.pop(0)
+        else:
+            return None
+    def peek(self):   # 修正空list，空队列的问题
+        if len(self.items) != 0:
+            return self.items[len(self.items)-1]
+        else:
+            return None    # 如果是空队列，peek将返回空值
+    def size(self):
+            return len(self.items)
+    def __str__(self):
+        return self.items.__str__()
+    def __repr__(self):
+        return self.items.__repr__()
+
+
+class Queue_new:
+    def __init__(self):
+        self.items = []
+    def isEmpty(self):
+        return self.items == []
+    def enqueue(self, item): self.items.insert(0, item)
+
+    def dequeue(self):
+        return self.items.pop()
+    def size(self):
+        return len(self.items)
+
+# 传土豆问题
+"""
+传土豆。在这个游戏中，孩子 们围成一圈，并依次尽可能快地传递一个土豆
+在某个时刻，大家停止传递，此时手里有土豆的孩子就得退出游戏
+重复上述过程，直到只剩下一个孩子。
+这个游戏其实等价于著名的约瑟夫斯问题。弗拉维奥·约瑟夫斯是公元1世纪著名的历史学家。相传，约瑟夫斯当年和39个战友在
+山洞中对抗罗马军队。眼看着即将失败，他们决定舍生取义。于是， 他们围成一圈，从某个人开始，按顺时针方向杀掉第7人。约瑟夫
+斯同时也是卓有成就的数学家。据说，他立刻找到了自己应该站的位置，从而使自己活到了最后。当只剩下他时，约瑟夫斯加入了罗
+马军队，而不是自杀。这个故事有很多版本，有的说是每隔两个人， 有的说最后一个人可以骑马逃跑。不管如何，问题都是一样的。
+"""
+# 修改为随机数
+
+import random
+def hotPotato(namelist):
+    simqueue = Queue()
+    for name in namelist:
+        simqueue.enqueue(name)
+    while simqueue.size() > 1:
+        num = random.randint(0, len(namelist) - 1)
+        for i in range(num):
+            simqueue.enqueue(simqueue.dequeue())
+        simqueue.dequeue()
+    return simqueue.dequeue()
+
+print(hotPotato(["Bill", "David", "Susan", "Jane", "Kent", "Brad"]))
+
+
+
+
+
+
+
+"""
+双端队列
+英文名 deque(与 deck 同音)
+双端队列 是与队列类似的有序集合。它有一前、一后两端，元素 在其中保持自己的位置。
+与队列不同的是，双端队列对在哪一端添 加和移除元素没有任何限制。新元素既可以被添加到前端，也可以 被添加到后端。同理，已有的元素也能从任意一端移除。
+某种意义上，双端队列是栈和队列的结合。
+
+"""
+
+class Deque:
+    def __init__(self):
+        self.items = []
+    def isEmpty(self):
+        return self.items == []
+    def addFront(self, item):
+        self.items.append(item)
+    def addRear(self, item):
+        self.items.insert(0, item)
+    def removeFront(self):
+        return self.items.pop()
+    def removeRear(self):
+        return self.items.pop(0)
+    def size(self):
+        return len(self.items)
+
+# 回文数检测
+
+def palchecker(aString):
+    chardeque = Deque()
+    for ch in aString:
+        chardeque.addRear(ch)
+    stillEqual = True
+    while chardeque.size() > 1 and stillEqual:
+        first = chardeque.removeFront()
+        last = chardeque.removeRear()
+        if first != last:
+            stillEqual = False
+    return stillEqual
+
+
+"""
+python 列表
+实现无序列表：构建链表
+无序列表需要维持元素之间的相对位置，但是并不需要在连续的内存空间中维护这些位置信息。
+如果可以为每一个元素维护一份信息，即下一个元素的位置 (如图 3-19 所示)，那么这些元素的相对位置就能通过指向下一个元素的链接来表示。
+"""
+
+# 指向链表第一个元素的引用是头 最后一个元素需要明确没有下一个元素
+
+# Node类:
+"""
+节点 (node)是构建链表的基本数据结构。
+每一个节点对象都必须持有至少两份信息。
+首先，节点必须包含列表元素，我们称之为节点的数据变量。
+其次，节点必须保存指向下一个节点的引用。
+
+Node 的构造方法将 next 的初始值设为 None 。
+由于这有时被称 为“将节点接地”，因此我们使用接地符号来代表指向 None 的引用。 
+将 None 作为 next 的初始值是不错的做法。
+
+
+列表类本 身并不包含任何节点对象，而只有指向整个链表结构中第一个节点 的引用。
+
+"""
+
+class Node:
+    def __init__(self, initdata):
+        self.data = initdata
+        self.next = None
+    def getData(self):
+        return self.data
+    def getNext(self):
+        return self.next
+    def setData(self, newdata):
+        self.data = newdata
+    def setNext(self, newnext):
+        self.next = newnext
+
+
+class UnorderedList:  # UnorderedList 类的构造方法
+    def __init__(self):
+        self.head = None
+    def isEmpty(self):
+        return self.head == None
+    def add(self, item):
+        temp = Node(item)
+        temp.setNext(self.head) # 顺序非常重要，头节点是唯一指向列表节点的外部引用
+        self.head = temp
+# 看图片，非常重要
+
+
+
+
