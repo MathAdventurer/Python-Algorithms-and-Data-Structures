@@ -49,6 +49,15 @@ String object doesn't support item assignment ##不可修改的错误
 'David'
 >>> myName[0]='X'
 
+string有sorted方法, 没有sort方法：
+
+sorted(iterable, /, *, key=None, reverse=False)
+    Return a new list containing all items from the iterable in ascending order.  
+    A custom key function can be supplied to customize the sort order, and the
+    reverse flag can be set to request the result in descending order.
+
+
+
 1.3 tuple 元组
  (, , )
 异构数据序列，因此元组 与列表非常相似。
@@ -58,14 +67,19 @@ String object doesn't support item assignment ##不可修改的错误
 1.4 set 
 无序的
 {}
-是由零个或多个不可修改的 Python 数据对象组成的无 序集合。
-集不允许重复元素，并且写成由花括号包含、以逗号分隔 的一系列值。
+是由零个或多个不可修改的 Python 数据对象组成的无序集合。
+集不允许重复元素，并且写成由花括号包含、以逗号分隔的一系列值。
 空集由 set() 来表示。
-集是异构的，并且可以通过 下面的方法赋给变量。
+集是异构的，并且可以通过下面的方法赋给变量。(但是必须是immutable的元素组成的)
 {False, 4.5, 3, 6, 'cat'}
 
 成员in ( \| 返回一个包含 aset 与 otherset 所有元素的新集) (- 返回一个集，其中包含只出现在 aset 中的元素)
 长度len  &交运算  (<=  询问 aset 中的所有元素是否都在 otherset 中 ,直接返回一个boolean)
+
+# Mutable collection of unique unordered immutable objects
+  a = {1,2,3,"str",{1,2,3}}
+  TypeError: unhashable type: 'set'
+
 
 1.5 Python 中的collection方法
 
@@ -78,18 +92,19 @@ clear 清除 aset 中的所有元素 clear() takes no arguments (1 given) 返回
 
 
 1.6 Python 字典
-字典是无序结构，由相关的元 素对构成，其中每对元素都由一个键和一个值组成。这种键–值对 通常写成键:值的形式。字典由花括号包含的一系列以逗号分隔的 键–值对表达，如下所示。
+字典是无序结构，由相关的元素对构成，其中每对元素都由一个键和一个值组成。这种键–值对 通常写成键:值的形式。
+字典由花括号包含的一系列以逗号分隔的 键–值对表达，如下所示。
 {} dict()
 dict使用key 而不是 index访问
 添加新值 capitals['Utah']='SaltLakeCity'
 
 Utah':'SaltLakeCity' )被放在了字典的第一位， 
-第二个添加的键–值对('California':'Sacramento' )则被 放在了最后。
+第二个添加的键–值对('California':'Sacramento' )则被放在了最后。
 键的位置是由散列来决定的，
 
 字典既有运算符，又有方法。
  keys 、values 和 items 方法均会返回包含相应值的对象。
- 可 以使用 list 函数将字典转换成列表
+ 可以使用 list 函数将字典转换成列表
  
  字典的运算
  索引[] 输入key，返回value
@@ -126,8 +141,8 @@ Hello***World
 Hello World***>>>
 
 print(aName, "is", age, "years old.")
-print("%s is %d years old." % (aName, age))  % 是字符串运算符， 被称作格式化运算符 。表达式的左边部分是模板(也叫格式化字 符串)，
-右边部分则是一系列用于格式化字符串的值。需要注意的 是，右边的值的个数与格式化字符串中% 的个数一致。这些值将依 次从左到右地被换入格式化字符串。
+print("%s is %d years old." % (aName, age))  % 是字符串运算符， 被称作格式化运算符 。表达式的左边部分是模板(也叫格式化字符串)，
+右边部分则是一系列用于格式化字符串的值。需要注意的 是，右边的值的个数与格式化字符串中% 的个数一致。这些值将依次从左到右地被换入格式化字符串。
 
 表 1-9 格式化字符串可用的类型声明
 字符
@@ -170,9 +185,9 @@ while counter <= 5:
 while counter <= 10 and not done:
 for item in [1,3,6,2,5]:
 分支结构
-Python 的缩进模式帮助我们在不需要额外语法元素的情况下有效 地关联对应的 if 和 else 。
+Python 的缩进模式帮助我们在不需要额外语法元素的情况下有效地关联对应的 if 和 else 。
 另一种表达嵌套分支的语法是使用 elif 关键字。将 else 和下 一个 if 结合起来，可以减少额外的嵌套层次。
-注意，最后的 else 仍然是必需的，它用来在所有分支条件都不满足的情况下提 供默认分支。
+注意，最后的 else 仍然是必需的，它用来在所有分支条件都不满足的情况下提供默认分支。
 
 使用列表解析式，只需一行代码即可创建完成。可使用迭代和分支结构
 sqlist = [x*x for x in range(1,11)]
@@ -212,16 +227,16 @@ raise 语句来触发运行时异常。例如，可以先 检查值是否为负�
 先取1/2然后 root= 1/2(root+ (n/root))
 
 6.面向对象
-a. Fraction类 抽象的分数
+a. Fraction类抽象的分数
 所有的类首先都应该有构造方法
 在 Python 中，构造方法总是命名为__init__ (即在 init 的前后分别有两个下划线)
 
 b. 继承:逻辑门与电路
-继承 使一个类与 另一个类相关联，就像人们相互联系一样。孩子从父母那里继承了 特征。
-与之类似，Python 中的子类 可以从父类继承特征数据和行 为。
-父类也称为超类 。
+继承 使一个类与另一个类相关联，就像人们相互联系一样。孩子从父母那里继承了特征。
+与之类似，Python 中的子类可以从父类继承特征数据和行 为。
+父类也称为超类。
 继承的层次结构:
-列表是有序集合 的子。因此，我们将列表称为子，有序集合称为父(或者分别称为子类列表和超类序列）
+列表是有序集合的子。因此，我们将列表称为子，有序集合称为父(或者分别称为子类列表和超类序列）
 
 模拟:逻辑门是这个模拟程序的基本构造单元，它们代表其输入和输出之间的布尔代数关系
 AND gate
@@ -254,7 +269,8 @@ class Fraction:
     def __init__(self,top,bottom):
         self.num = top   #self指向对象本身，形式参数（不需要实际的参数）
         self.den = bottom
-        # 分数需要分子与分母两部分状态数据 构造方法中的 self.num 定义了 Fraction 对象有 一个叫作 num 的内部数据对象作为其状态的一部分。同理， self.den 定义了分母。
+        # 分数需要分子与分母两部分状态数据 构造方法中的 self.num 定义了 Fraction 对象有一个叫作num的内部数据对象作为其状态的一部分。同理,
+        # self.den 定义了分母。
         # 创建对象的时候能够知道初始值
     #打印对象的两种方法
     # 定义show方法
@@ -430,7 +446,7 @@ class Connector:
 
 if __name__ == "__main__":
 
-g1 = AndGate("G1")
+    g1 = AndGate("G1")
     #g1.getOutput()
     print(g1.getOutput()) #print会直接调用
     g2 = OrGate("G2")
