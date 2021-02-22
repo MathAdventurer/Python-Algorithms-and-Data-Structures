@@ -5,6 +5,16 @@
 """
 chapter3 基本数据结构
 
+线性数据结构以有序的方式来维护其数据。
+表达式有 3 种写法:前序、中序和后序。栈在计算和转换表达式的算法中十分有用。栈具有反转特性。
+队列有助于构建时序模拟。
+双端队列是栈和队列的结合。
+
+
+列表是元素的集合，其中每一个元素都有一个相对于其他元素的位置。
+链表保证逻辑顺序，对实际的存储顺序没有要求。
+修改链表头部是一种特殊情况。
+
 definition of linear structure：
 栈、队列、双端队列和列表都是有序的数据集合，其元素的顺序取决于添加顺序或移除顺序。
 一旦某个元素被添加进来，它与前后元素的相对位置将保持不变。
@@ -123,7 +133,7 @@ class Stack_new:
 
 # 匹配括号以及正确的嵌套关系
 
-from __main__ import Stack
+# from __main__ import Stack
 
 def parChecker(symbolString):
     s = Stack()
@@ -238,7 +248,7 @@ def matches(open, close):
 # 用python实现二进制 除以2算法
 # 使用内建取余的%运算符
 
-from __main__ import Stack
+# from __main__ import Stack
 
 def divideBy2(decNumber):
     remstack = Stack()
@@ -327,7 +337,7 @@ def baseConverter(decNumber,base):
 # 实现中序表达式转后序表达式
 
 
-from __main__ import Stack
+# from __main__ import Stack
 import string
 
 def infixToPostfix(infixexpr):
@@ -377,7 +387,7 @@ print(infixToPostfix("A + B * C"))
 
 # 实现后序表达式的计算
 
-from __main__ import Stack
+# from __main__ import Stack
 
 def postfixEval(postfixExpr):
     operandStack = Stack()
@@ -500,6 +510,7 @@ print(hotPotato(["Bill", "David", "Susan", "Jane", "Kent", "Brad"]))
 双端队列 是与队列类似的有序集合。它有一前、一后两端，元素 在其中保持自己的位置。
 与队列不同的是，双端队列对在哪一端添 加和移除元素没有任何限制。新元素既可以被添加到前端，也可以 被添加到后端。同理，已有的元素也能从任意一端移除。
 某种意义上，双端队列是栈和队列的结合。
+双端队列不能从中间插入元素
 
 """
 
@@ -519,14 +530,14 @@ class Deque:
     def size(self):
         return len(self.items)
 
-# 回文数检测
+# 回文数检测 双端队列的应用
 
 def palchecker(aString):
     chardeque = Deque()
     for ch in aString:
         chardeque.addRear(ch)
     stillEqual = True
-    while chardeque.size() > 1 and stillEqual:
+    while chardeque.size() > 1 and stillEqual:  # 只剩下一个字符串时本身就是一个回字符串
         first = chardeque.removeFront()
         last = chardeque.removeRear()
         if first != last:
@@ -535,7 +546,14 @@ def palchecker(aString):
 
 
 """
-python 列表
+python 列表 线性数据结构，维护元素之间的相对位置 
+
+
+列表 vs 链表： 列表要求顺序存储结构， 链表不要求顺序存储结构 
+
+
+链表： 有序链表 vs 无序链表
+
 实现无序列表：构建链表
 无序列表需要维持元素之间的相对位置，但是并不需要在连续的内存空间中维护这些位置信息。
 如果可以为每一个元素维护一份信息，即下一个元素的位置 (如图 3-19 所示)，那么这些元素的相对位置就能通过指向下一个元素的链接来表示。
@@ -572,7 +590,7 @@ class Node:
     def setNext(self, newnext):
         self.next = newnext
 
-
+# 新元素添加到表头的难度比较小， 而且复杂度是O1的， 使用id() 函数查看地址 self.head.getData() 查看当前节点的值
 class UnorderedList:  # UnorderedList 类的构造方法
     def __init__(self):
         self.head = None
@@ -584,6 +602,110 @@ class UnorderedList:  # UnorderedList 类的构造方法
         self.head = temp
 # 看图片，非常重要
 
+# 无序列表的地址不变id(l1), 而且已经存在的节点修改，地址也不变
+# Out[24]: 140456043941168
+# l1.head.setNext(Node(3))
+# id(l1)
+# Out[26]: 140456043941168
+# l1.head.getNext()
+# Out[29]: <__main__.Node at 0x7fbe789bd6d0>
+# l1.head.getNext()
+# Out[22]: <__main__.Node at 0x7fbe804affd0>
+
+    def length(self):
+        current = self.head
+        count = 0
+        while current != None:
+            count +=1
+            current = current.getNext()
+        return count
+    def search(self,item):
+        current = self.head
+        found = False
+        while current != None and not found:
+            if current.getData() == item:
+                found = True
+            else:
+                current = current.getNext()
+        return found
+    def remove(self,item):
+        current = self.head()
+        previous = None
+        found = False
+        while not found:
+            if current.getData == item:
+                found = True
+            else:
+                previous =current
+                current = current.getNext()
+        if previous == None: #处理移除的时候在表头的情况
+            self.head = current.getNext()
+        else:
+            previous.setNext(current.getNext()) #连接新的链表
+
+
+    # append insert index 和 pop 方法练习 注意，
+    # 每一个方法都需要考虑操作是发生在链表的头节点还是别的 位置。
+    # 此外，insert 、index 和 pop 需要提供元素在链表中的位置。
+    # 请假设位置是从 0 开始的整数。
 
 
 
+# 无序列表的实现
+# 此处默认元素是从小到大排列的
+class OrderedList():
+    def __init__(self):
+        self.head = None
+    def isEmpty(self):
+        return self.head == None
+    def length(self):
+        current = self.head
+        count = 0
+        while current != None:
+            count +=1
+            current = current.getNext()
+        return count
+    def search(self,item):
+        current = self.head
+        found = False
+        stop = False
+        while current != None and not found and not stop:
+            if current.getData() == item:
+                found = True
+            elif current.getData()>item:
+                stop = True
+            else:
+                current = current.getNext()
+        return found
+
+    def add(self,item):
+        current = self.head
+        previous = None
+        stop = False
+        while current != None and not stop:
+            if current.getData() > item:
+                stop = True
+            else:
+                previous = current # 与插入，搜索类似 需要记录前驱节点
+                current = current.getNext()
+        temp = Node(item)
+        if previous == None: # 判断是否在链表的开头添加
+            temp.setNext(self.head)
+            self.head = temp
+        else:  #拼接链表
+            temp.setNext(current)
+            previous.setNext(temp)
+
+"""
+链表的时间复杂度分析：
+isEmpty O(1)
+length O(n)
+add() 无序链表 O(1) 有序链表 O(n) 平均O(n/2)
+search O(n) 平均O(n/2)
+remove O(n) 平均O(n/2)
+
+
+
+python此处实现的链表与Python列表有差异
+Python的列表并不是通过链表实现的，而是基于数组实现的
+"""
