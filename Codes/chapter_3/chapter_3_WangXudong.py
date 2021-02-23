@@ -629,11 +629,11 @@ class UnorderedList:  # UnorderedList 类的构造方法
                 current = current.getNext()
         return found
     def remove(self,item):
-        current = self.head()
+        current = self.head
         previous = None
         found = False
         while not found:
-            if current.getData == item:
+            if current.getData() == item:
                 found = True
             else:
                 previous =current
@@ -642,13 +642,72 @@ class UnorderedList:  # UnorderedList 类的构造方法
             self.head = current.getNext()
         else:
             previous.setNext(current.getNext()) #连接新的链表
-
-
     # append insert index 和 pop 方法练习 注意，
     # 每一个方法都需要考虑操作是发生在链表的头节点还是别的 位置。
     # 此外，insert 、index 和 pop 需要提供元素在链表中的位置。
     # 请假设位置是从 0 开始的整数。
 
+    def append(self,item):  # 在链表尾部添加
+        current = self.head
+        while current.getNext != None:
+            current = current.getNext()
+        current.setNext(Node(item))
+    # def index(self,item):
+    #     current = self.head
+    #     i = 0
+    #     node_index = dict()
+    #     while current !=None:
+    #         node_index.get(current.getData(),i)
+    #         current = current.getNext()
+    #         i += 1
+    #     return node_index[item]
+    def index(self,*args):
+        current = self.head
+        i = 0
+        node_index = dict()
+        while current !=None:
+            # node_index.get(current.getData(),i)
+            node_index[current.getData()] = i
+            current = current.getNext()
+            i += 1
+        if args:
+            try:
+                return node_index[args[0]]
+            except:
+                return f"Not find {args[0]}'s index, Please check the List."
+        else:
+            return node_index
+    def pop(self,*args): #从链表尾部删除,或指定index删除
+        current = self.head
+        if args:
+            index_temp = args[0]
+            index_dict = self.index()
+            item = list(index_dict.keys())[list(index_dict.values()).index(index_temp)]
+            self.remove(item)
+        else:
+            while current.getNext() != None:
+                current = current.getNext()
+            self.remove(current.getData())
+            return current.getData()
+    # def __str__(self):
+    #     return f"Unordered List: head:{list(self.index().keys())[0]} --> end:{list(self.index().keys())[-1]}\n{self.index()}"
+    def __str__(self):
+        index = self.index()
+        list_i = list(index.keys())
+        return f"Unordered List: head:{list_i[0]} --> end:{list_i[-1]}\n{index}"
+
+# test Unordered list
+a = UnorderedList()
+for i in range(11):
+    a.add(i)
+a.index()
+print(a)
+a.pop()
+a.index(4)
+a.pop(6)
+a.length()
+a.index()
+print(a)
 
 
 # 无序列表的实现
